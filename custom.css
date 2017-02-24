@@ -1,0 +1,7 @@
+#user-list{
+  margin-top: 15px;
+}
+#message-box{
+  height: 300px;
+  overflow: scroll;
+}
