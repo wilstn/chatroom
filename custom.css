@@ -5,3 +5,17 @@
   height: 300px;
   overflow: scroll;
 }
+.profilepic{
+  float: left;
+  background-color: grey;
+  margin-right: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+.profilepic img{
+  width: 50px;
+  height: 50px;
+}
+.message-content{
+  margin-left: 60px;
+}

@@ -3,9 +3,10 @@ function getMessageHistory(){
     var message = "";
     $.each(data, function(key, value){
       message += '<div class="panel-body" id=' + key + ' >'
-      message += '<strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
+      message += '<div class=profilepic><img src=' + value["user"] + '.jpg ></div>'
+      message += '<div class="message-content"><strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
       message += value["content"]
-      message += '<br></div>'
+      message += '</div></div>'
     })
     $('#message-box').append(message);
   })
@@ -41,13 +42,15 @@ function getLatestMessage(){
           return true;
         }else{
           latestMessages += '<div class="panel-body" id=' + key + ' >'
-          latestMessages += '<strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
+          latestMessages += '<div class=profilepic><img src=' + value["user"] + '.jpg ></div>'
+          latestMessages += '<div class="message-content"><strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
           latestMessages += value["content"]
-          latestMessages += '<br></div>'
+          latestMessages += '</div></div>'
         }
       })
       $('#' + latestMessageId).after(latestMessages);
 
+      // Problem: to scroll only when there are new messages, not scroll very 2 secs
       var heightToScroll = $('#message-box')[0].scrollHeight;
       $('#message-box').scrollTop(heightToScroll);
 
@@ -55,9 +58,9 @@ function getLatestMessage(){
 
     }).done(
       // On success of getting latest messages, sets timeout of 2 secs to retrieve new messages again.
-      setTimeout(function(){
-        getLatestMessage()
-      }, 2000)
+      // setTimeout(function(){
+      //   getLatestMessage()
+      // }, 2000)
     )
 }
 
@@ -72,6 +75,7 @@ $(document).ready(function(){
         console.log("empty content, nothing posted")
       }else if($('#user-list').val() == ""){
         console.log("no user selected, nothing posted")
+        alert("Please select a user first")
       }else{
         postMessage();
         $('#post-list').val('');
@@ -81,8 +85,12 @@ $(document).ready(function(){
   })
 
   // Gets the latest message after 3 secs.
-  setTimeout(function(){
-    getLatestMessage()
-  }, 3000)
+  // setTimeout(function(){
+  //   getLatestMessage()
+  // }, 3000)
 
 })
+
+// Possible to do:
+// - add new users and their profile pics how?? 
+// - sidebar with multiple chatrooms??
