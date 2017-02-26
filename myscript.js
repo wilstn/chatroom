@@ -1,25 +1,14 @@
-// function getCurrentUser(){
-//   var currentUser = $('#user-list :selected').val();
-//   console.log(currentUser)
-// }
-
 function getMessageHistory(){
   $.get('https://ac-project-2.firebaseio.com/messages.json', function(data, status){
-    //get messages from server using setInterval
     var message = "";
     $.each(data, function(key, value){
-      message += '<div class="panel-body"'
-      message += 'id=' + key + '>'
+      message += '<div class="panel-body" id=' + key + ' >'
       message += '<strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
       message += value["content"]
       message += '<br></div>'
     })
-    $('#message-box').append(message)
-    console.log("this populates UI with the list")
-
-    getLatestMessage();
+    $('#message-box').append(message);
   })
-  console.log("this populates the list")
 }
 
 function populateDropdownList(){
@@ -37,35 +26,63 @@ function postMessage(){
   var timestamp = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})
   var content = $('#post-list').val();
   var thingToPost = {"user":username, "timestamp":timestamp, "content":content}
-  console.log(thingToPost);
+
   $.post('https://ac-project-2.firebaseio.com/messages.json', JSON.stringify(thingToPost))
-  // .done()
-  // .fail()
 }
 
 function getLatestMessage(){
-  var latestMessageId = $(".panel-body:last-child");
-  console.log("this gets latest msg")
-  console.log(latestMessageId.val());
-  console.log($(".panel-body:last-child"));
-  // https://ac-project-2.firebaseio.com/messages.json?orderBy="$key"&startAt="3"
+  var latestMessageId = $(".panel-body:last-child").attr('id');
+  // get url format: https://ac-project-2.firebaseio.com/messages.json?orderBy="$key"&startAt="3"
+  $.get('https://ac-project-2.firebaseio.com/messages.json?orderBy="$key"&startAt="' + latestMessageId + '"',
+    function(data, status){
+      var latestMessages = "";
+      $.each(data, function(key, value){
+        if(key == latestMessageId){
+          return true;
+        }else{
+          latestMessages += '<div class="panel-body" id=' + key + ' >'
+          latestMessages += '<strong>' + value["user"] + '</strong><small class="pull-right">' + value["timestamp"] + '</small><br>'
+          latestMessages += value["content"]
+          latestMessages += '<br></div>'
+        }
+      })
+      $('#' + latestMessageId).after(latestMessages);
+
+      var heightToScroll = $('#message-box')[0].scrollHeight;
+      $('#message-box').scrollTop(heightToScroll);
+
+      console.log("retrived the latest messages")
+
+    }).done(
+      // On success of getting latest messages, sets timeout of 2 secs to retrieve new messages again.
+      setTimeout(function(){
+        getLatestMessage()
+      }, 2000)
+    )
 }
 
 $(document).ready(function(){
   populateDropdownList();
   getMessageHistory();
 
+  // Posts message on keypress enter
   $('#post-list').keypress(function(event){
     if(event.which == 13){
-      postMessage();
-      $('#post-list').val('');
-      if(event.preventDefault) {event.preventDefault();}
+      if($('#post-list').val() == ""){
+        console.log("empty content, nothing posted")
+      }else if($('#user-list').val() == ""){
+        console.log("no user selected, nothing posted")
+      }else{
+        postMessage();
+        $('#post-list').val('');
+        if(event.preventDefault) {event.preventDefault();}
+      }
     }
   })
 
-  //getLatestMessage();
+  // Gets the latest message after 3 secs.
+  setTimeout(function(){
+    getLatestMessage()
+  }, 3000)
 
 })
-
-// To do list:
-// - Take only latest after post message -> query order by, limit
